@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, F, types
 from openai import AsyncOpenAI
 
 # Kalitlar va Topic ID
-BOT_TOKEN = "8828352481:AAH6aKWWkV8Ty1f9_JjXTjPuGeooTTHO3Eg"
+BOT_TOKEN = "8828352481:AAENIHzIumjrvvr6Q8V7X8En0YZtC5MvTWw"
 OPENAI_API_KEY = "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"
 TARGET_TOPIC_ID = 143  # AI Yordamchi mavzusining To
 
