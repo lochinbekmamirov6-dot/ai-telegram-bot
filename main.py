@@ -28,6 +28,7 @@ async def handle_ai_message(message: types.Message):
   await bot.send_chat_action(message.chat.id, "typing")
 
   try:
+    # Model nomini rasmiy to'liq shaklda yuboramiz
     response = await client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
@@ -40,7 +41,7 @@ async def handle_ai_message(message: types.Message):
     )
     await message.reply(response.choices[0].message.content)
   except Exception as e:
-    # Xatolik yuz bersa, sababini to'g'ridan-to me telegramga yuboradi
+    # Xatolikni Telegramga chiqarish
     await message.reply(f"Xatolik yuz berdi:\n{e}", parse_mode="Markdown")
 
 
