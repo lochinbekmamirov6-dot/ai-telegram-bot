@@ -7,7 +7,7 @@ from groq import AsyncGroq
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-TARGET_TOPIC_ID = 143  # AI Yordamchi mavzusining Topic ID si
+TARGET_TOPIC_ID = 143
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -19,7 +19,6 @@ async def handle_ai_message(message: types.Message):
   if not message.text:
     return
 
-  # Agar xabar guruhdan kelgan bo'lsa va topic id mos kelmasa, javob bermaydi
   if (
       message.chat.type in ["group", "supergroup"]
       and message.message_thread_id != TARGET_TOPIC_ID
@@ -41,10 +40,10 @@ async def handle_ai_message(message: types.Message):
     )
     await message.reply(response.choices[0].message.content)
   except Exception as e:
-    logging.error(f"Xatolik: {e}")
+    # Xatolik yuz bersa, sababini to'g'ridan-to me telegramga yuboradi
+    await message.reply(f"Xatolik yuz berdi:\n{e}", parse_mode="Markdown")
 
 
-# Render uchun soxta port serveri
 async def handle_ping(request):
   return web.Response(text="Bot active")
 
