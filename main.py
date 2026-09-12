@@ -33,7 +33,7 @@ async def handle_ai_message(message: types.Message):
     try:
         url = (
             "https://generativelanguage.googleapis.com/v1beta/"
-            "models/gemini-2.5-flash-lite:generateContent"
+            "models/gemini-3.5-flash-lite:generateContent"
         )
 
         params = {
