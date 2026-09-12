@@ -30,7 +30,7 @@ async def handle_ai_message(message: types.Message):
 
   try:
     response = await client.chat.completions.create(
-        model="llama-3.3-70b-8192",
+        model="llama-3.1-8b-instant",
         messages=[
             {
                 "role": "system",
