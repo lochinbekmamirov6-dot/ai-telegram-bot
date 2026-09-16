@@ -372,7 +372,8 @@ async def handle_message(message: types.Message):
             answer = await ask_gemini_file(
                 file_path,
                 prompt
-            )await message.reply(answer)
+            )
+            await message.reply(answer)
 
         except Exception as e:
 
