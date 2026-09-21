@@ -21,6 +21,7 @@ TARGET_TOPIC_ID = 143
 
 MODEL = "gemini-3.5-flash-lite"
 
+
 SYSTEM_PROMPT = """
 Siz PVZ administratorlari uchun AI yordamchisiz.
 
@@ -58,11 +59,11 @@ gemini = genai.Client(api_key=GEMINI_API_KEY)
 
 def allowed_message(message: types.Message) -> bool:
 
-    # Private chatda ishlaydi
+    # Private chat
     if message.chat.type == "private":
         return True
 
-    # Group / supergroup
+    # Group / Supergroup
     if message.chat.type in ["group", "supergroup"]:
 
         # Faqat 143-topic
@@ -99,7 +100,11 @@ async def ask_gemini_text(text: str):
 # GEMINI IMAGE
 # =========================
 
-async def ask_gemini_image(image_bytes: bytes, mime_type: str, prompt: str):
+async def ask_gemini_image(
+    image_bytes: bytes,
+    mime_type: str,
+    prompt: str
+):
 
     def request():
 
@@ -128,11 +133,14 @@ async def ask_gemini_image(image_bytes: bytes, mime_type: str, prompt: str):
 # GEMINI FILE
 # =========================
 
-async def ask_gemini_file(file_path: str, prompt: str):
+async def ask_gemini_file(
+    file_path: str,
+    prompt: str
+):
 
     def upload_and_request():
 
-        # Gemini Files API'ga yuklash
+        # Gemini Files API
         uploaded_file = gemini.files.upload(
             file=file_path
         )
@@ -144,7 +152,6 @@ async def ask_gemini_file(file_path: str, prompt: str):
                 name=uploaded_file.name
             )
 
-            # Video/audio processing tugagan bo'lsa
             if getattr(current_file, "state", None):
 
                 state_name = getattr(
@@ -153,12 +160,20 @@ async def ask_gemini_file(file_path: str, prompt: str):
                     str(current_file.state)
                 )
 
-                if state_name in ["ACTIVE", "STATE_ACTIVE"]:
+                if state_name in [
+                    "ACTIVE",
+                    "STATE_ACTIVE"
+                ]:
                     uploaded_file = current_file
                     break
 
-                if state_name in ["FAILED", "STATE_FAILED"]:
-                    raise Exception("Gemini faylni qayta ishlay olmadi.")
+                if state_name in [
+                    "FAILED",
+                    "STATE_FAILED"
+                ]:
+                    raise Exception(
+                        "Gemini faylni qayta ishlay olmadi."
+                    )
 
             import time
             time.sleep(2)
@@ -176,14 +191,19 @@ async def ask_gemini_file(file_path: str, prompt: str):
 
         return response.text
 
-    return await asyncio.to_thread(upload_and_request)
+    return await asyncio.to_thread(
+        upload_and_request
+    )
 
 
 # =========================
 # TELEGRAM FILE DOWNLOAD
 # =========================
 
-async def download_telegram_file(file_id: str, suffix: str):
+async def download_telegram_file(
+    file_id: str,
+    suffix: str
+):
 
     temp_file = tempfile.NamedTemporaryFile(
         delete=False,
@@ -201,11 +221,13 @@ async def download_telegram_file(file_id: str, suffix: str):
 
 
 # =========================
-# TEXT
+# MESSAGE HANDLER
 # =========================
 
 @dp.message()
-async def handle_message(message: types.Message):
+async def handle_message(
+    message: types.Message
+):
 
     if not allowed_message(message):
         return
@@ -231,7 +253,9 @@ async def handle_message(message: types.Message):
 
         except Exception as e:
 
-            logging.exception("Text AI error")
+            logging.exception(
+                "Text AI error"
+            )
 
             await message.reply(
                 f"❌ Xatolik:\n{e}"
@@ -283,7 +307,9 @@ async def handle_message(message: types.Message):
 
         except Exception as e:
 
-            logging.exception("Photo AI error")
+            logging.exception(
+                "Photo AI error"
+            )
 
             await message.reply(
                 f"❌ Rasmni tahlil qilishda xatolik:\n{e}"
@@ -314,7 +340,8 @@ async def handle_message(message: types.Message):
             prompt = (
                 "Bu Telegram voice xabarini tinglab, "
                 "unda nima aytilganini tushuning va "
-                "foydalanuvchining savoliga o'zbek tilida javob bering."
+                "foydalanuvchining savoliga o'zbek tilida "
+                "javob bering."
             )
 
             answer = await ask_gemini_file(
@@ -326,7 +353,9 @@ async def handle_message(message: types.Message):
 
         except Exception as e:
 
-            logging.exception("Voice AI error")
+            logging.exception(
+                "Voice AI error"
+            )
 
             await message.reply(
                 f"❌ Voice xabarni tahlil qilishda xatolik:\n{e}"
@@ -357,9 +386,7 @@ async def handle_message(message: types.Message):
             file_path = await download_telegram_file(
                 message.video.file_id,
                 ".mp4"
-            )
-
-            prompt = (
+            )prompt = (
                 message.caption
                 if message.caption
                 else
@@ -373,11 +400,14 @@ async def handle_message(message: types.Message):
                 file_path,
                 prompt
             )
+
             await message.reply(answer)
 
         except Exception as e:
 
-            logging.exception("Video AI error")
+            logging.exception(
+                "Video AI error"
+            )
 
             await message.reply(
                 f"❌ Videoni tahlil qilishda xatolik:\n{e}"
@@ -426,7 +456,9 @@ async def handle_message(message: types.Message):
 
         except Exception as e:
 
-            logging.exception("Video note AI error")
+            logging.exception(
+                "Video note AI error"
+            )
 
             await message.reply(
                 f"❌ Video note'ni tahlil qilishda xatolik:\n{e}"
@@ -444,7 +476,9 @@ async def handle_message(message: types.Message):
 # RENDER HEALTH CHECK
 # =========================
 
-async def handle_ping(request):
+async def handle_ping(
+    request
+):
 
     return web.Response(
         text="AI Helper 2.0 active"
@@ -461,6 +495,10 @@ async def main():
         level=logging.INFO
     )
 
+    # =====================
+    # RENDER WEB SERVER
+    # =====================
+
     app = web.Application()
 
     app.router.add_get(
@@ -473,7 +511,10 @@ async def main():
     await runner.setup()
 
     port = int(
-        os.getenv("PORT", 10000)
+        os.getenv(
+            "PORT",
+            10000
+        )
     )
 
     site = web.TCPSite(
@@ -488,8 +529,31 @@ async def main():
         "AI Helper 2.0 ishga tushdi!"
     )
 
-    await dp.start_polling(bot)
+    # =====================
+    # TELEGRAM WEBHOOKNI O'CHIRISH
+    # =====================
 
+    await bot.delete_webhook(
+        drop_pending_updates=True
+    )
+
+    logging.info(
+        "Telegram webhook o'chirildi."
+    )
+
+    # =====================
+    # POLLING
+    # =====================
+
+    await dp.start_polling(
+        bot
+    )
+
+
+# =========================
+# START
+# =========================
 
 if __name__ == "__main__":
+
     asyncio.run(main())
