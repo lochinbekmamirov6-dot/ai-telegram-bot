@@ -386,7 +386,8 @@ async def handle_message(
             file_path = await download_telegram_file(
                 message.video.file_id,
                 ".mp4"
-            )prompt = (
+            )
+            prompt = (
                 message.caption
                 if message.caption
                 else
